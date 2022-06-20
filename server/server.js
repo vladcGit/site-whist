@@ -18,7 +18,7 @@ const port = process.env.PORT || 3001;
 
 const server = app.listen(port, async () => {
   await sequelize.authenticate();
-  await sequelize.sync({ force: true });
+  await sequelize.sync({ force: false });
   console.log(`Pornit pe portul ${port}`);
 });
 

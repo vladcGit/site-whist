@@ -115,7 +115,6 @@ app.post('/new', async (req, res) => {
     };
     const id = await getRandomId();
     const room = await Room.create({ id });
-    await shuffleCards(id);
     res.status(201).json(room);
   } catch (e) {
     console.error(e);
@@ -129,6 +128,8 @@ app.post('/:id/player/new', async (req, res) => {
     const room = await Room.findByPk(id);
     if (room == null)
       return res.status(400).json({ error: 'That room does not exist' });
+    if (room.getDataValue('is_started'))
+      return res.status(400).json({ error: 'That game has already started' });
     const { name } = req.body;
     const players = await room.getPlayers();
     const index_order = players.length + 1;
@@ -151,6 +152,7 @@ app.get('/:id/start', async (req, res) => {
     if (!room)
       return res.status(400).json({ error: 'That room does not exist' });
 
+    await shuffleCards(req.params.id);
     await room.update({ is_started: true });
 
     return res.status(200).json({ message: 'success' });
