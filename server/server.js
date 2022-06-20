@@ -12,17 +12,18 @@ app.use(express.json());
 
 // import rute
 app.use('/api/room', require('./routes/RoomRoutes'));
+app.use('/api/player', require('./routes/PlayerRoutes'));
 
 const port = process.env.PORT || 3001;
 
 const server = app.listen(port, async () => {
   await sequelize.authenticate();
-  await sequelize.sync({ force: false });
+  await sequelize.sync({ force: true });
   console.log(`Pornit pe portul ${port}`);
 });
 
 // web-socket
-const io = require('socket.io')(server, { cors: { origin: '*' } });
+const io = require('socket.io')(server);
 io.on('connection', (socket) => {
   const { id } = socket.handshake.query;
   const roomName = 'room-' + id;

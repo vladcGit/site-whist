@@ -40,6 +40,9 @@ const Room = sequelize.define('Room', {
       max: 36,
     },
   },
+  cards: {
+    type: DataTypes.STRING,
+  },
 });
 
 Room.hasMany(Player, { onDelete: 'CASCADE' });

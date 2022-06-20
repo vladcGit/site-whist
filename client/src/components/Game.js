@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, createStyles, Divider } from '@mantine/core';
+import { createStyles, Divider, Text } from '@mantine/core';
 
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import Players from './Players';
 
 const BREAKPOINT = '@media (max-width: 755px)';
 
@@ -22,13 +23,18 @@ const useStyles = createStyles((theme) => ({
     width: '100vw',
     maxWidth: '100vw',
     textAlign: 'center',
-    paddingTop: 50,
+    paddingTop: 10,
     paddingBottom: 120,
 
     [BREAKPOINT]: {
       paddingBottom: 80,
-      paddingTop: 50,
+      paddingTop: 10,
     },
+  },
+  image: {
+    maxWidth: '100%',
+    maxHeight: '15vh',
+    cursor: 'pointer',
   },
 
   title: {
@@ -114,46 +120,81 @@ export default function Game() {
       const { name } = JSON.parse(localStorage.getItem('data'));
       const _user = room.Players.filter((player) => player.name === name)[0];
       setUser(_user);
-      console.log(_user.cards);
     }
   }, [room, user]);
 
-  return (
-    <div className={classes.wrapper}>
-      {user && room && !room.is_finished && (
-        <Container className={classes.inner}>
-          <img
-            alt={room.atu}
-            src={`/svg/${room.atu}.svg`}
-            style={{
-              maxWidth: '100%',
-              maxHeight: '20vh',
-            }}
-          />
-          <Divider my='xl' />
+  const prevPlayer = room?.Players?.filter(
+    (p) => p.index_order === user?.index_order - 1
+  )[0];
 
-          {user.cards
-            .split(',')
-            .sort((a, b) => {
-              if (a[1] !== b[1]) return a.charCodeAt(1) - b.charCodeAt(1);
-              if (a[0] === 'A') return -1;
-              if (b[0] === 'A') return 1;
-              return a.charCodeAt(0) - b.charCodeAt(0);
-            })
-            .map((card) => (
-              <img
-                key={card}
-                alt={card}
-                src={`/svg/${card}.svg`}
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '20vh',
-                }}
-              />
-            ))}
-          <Divider my='xl' />
-        </Container>
+  const canPlayCard =
+    room?.Players?.filter((p) => p.initial_score == null).length === 0 &&
+    (!prevPlayer || prevPlayer.cards.length > user?.cards.length);
+
+  const playCard = async (card) => {
+    if (canPlayCard) console.log(card);
+  };
+
+  return (
+    <>
+      {user && room && !room.is_finished && (
+        <div style={{ position: 'relative' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'start',
+              alignItems: 'center',
+              minHeight: '100vh',
+            }}
+          >
+            <Text className={classes.description}>Trump card:</Text>
+            <img
+              alt={room.atu}
+              src={`/svg/${room.atu}.svg`}
+              className={classes.image}
+            />
+            <Divider my='xl' />
+            <Players room={room} user={user} callback={sendUpdate} />
+          </div>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              width: '100vw',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            {canPlayCard && (
+              <Text className={classes.subtitle}>It is your turn</Text>
+            )}
+            <Text className={classes.description}>
+              Your cards (click to play):
+            </Text>
+
+            {user.cards
+              .split(',')
+              .sort((a, b) => {
+                if (a[1] !== b[1]) return a.charCodeAt(1) - b.charCodeAt(1);
+                if (a[0] === 'A') return -1;
+                if (b[0] === 'A') return 1;
+                return a.charCodeAt(0) - b.charCodeAt(0);
+              })
+              .map((card) => (
+                <img
+                  key={card}
+                  alt={card}
+                  src={`/svg/${card}.svg`}
+                  className={classes.image}
+                  onClick={() => playCard(card)}
+                />
+              ))}
+            <Divider my='xl' />
+          </div>
+        </div>
       )}
-    </div>
+    </>
   );
 }

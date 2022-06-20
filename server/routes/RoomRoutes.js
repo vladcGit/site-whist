@@ -102,7 +102,7 @@ const shuffleCards = async (roomId) => {
 
   await room.update({ atu: deck.pop() });
 };
-
+//todo sa nu mai poata nimeni sa intre in joc daca a inceput deja
 app.post('/new', async (req, res) => {
   try {
     const getRandomId = async () => {
@@ -115,6 +115,7 @@ app.post('/new', async (req, res) => {
     };
     const id = await getRandomId();
     const room = await Room.create({ id });
+    await shuffleCards(id);
     res.status(201).json(room);
   } catch (e) {
     console.error(e);
