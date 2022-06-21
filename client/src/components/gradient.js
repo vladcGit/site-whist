@@ -1,14 +1,5 @@
 import { hexToRgb } from '../util';
 
-// const colors = [
-//   [62, 35, 255],
-//   [60, 255, 60],
-//   [255, 35, 98],
-//   [45, 175, 230],
-//   [255, 0, 255],
-//   [255, 128, 0],
-// ];
-
 const colors = [
   hexToRgb('117DAA'),
   hexToRgb('FF2362'),

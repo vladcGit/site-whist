@@ -64,16 +64,6 @@ app.get('/:id/start', async (req, res) => {
   }
 });
 
-app.get('/:id/shuffle', async (req, res) => {
-  try {
-    await shuffleCards(req.params.id);
-    const room = await Room.findByPk(req.params.id, { include: Player });
-    return res.json(room);
-  } catch (e) {
-    res.status(500).json(e);
-  }
-});
-
 app.get('/:id', async (req, res) => {
   try {
     const room = await Room.findByPk(req.params.id, {

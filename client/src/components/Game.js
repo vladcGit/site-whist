@@ -9,28 +9,6 @@ import Players from './Players';
 const BREAKPOINT = '@media (max-width: 755px)';
 
 const useStyles = createStyles((theme) => ({
-  wrapper: {
-    position: 'relative',
-    boxSizing: 'border-box',
-    overflowX: 'hidden',
-    minHeight: '100vh',
-    backgroundColor:
-      theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.white,
-  },
-
-  inner: {
-    position: 'relative',
-    width: '100vw',
-    maxWidth: '100vw',
-    textAlign: 'center',
-    paddingTop: 10,
-    paddingBottom: 120,
-
-    [BREAKPOINT]: {
-      paddingBottom: 80,
-      paddingTop: 10,
-    },
-  },
   image: {
     maxWidth: '100%',
     maxHeight: '15vh',
@@ -40,31 +18,6 @@ const useStyles = createStyles((theme) => ({
 
   divider: {
     width: '80%',
-  },
-
-  title: {
-    fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-    margin: '50px',
-    fontSize: 60,
-    fontWeight: 900,
-    lineHeight: 1.1,
-    padding: 0,
-    color: theme.white,
-
-    [BREAKPOINT]: {
-      fontSize: 42,
-      lineHeight: 1.2,
-    },
-  },
-
-  subtitle: {
-    margin: theme.spacing.xl,
-    fontSize: 45,
-    color: theme.white,
-
-    [BREAKPOINT]: {
-      fontSize: 25,
-    },
   },
 
   description: {

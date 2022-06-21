@@ -54,14 +54,6 @@ const useStyles = createStyles((theme) => ({
     },
   },
 
-  controls: {
-    marginTop: theme.spacing.xl * 2,
-
-    [BREAKPOINT]: {
-      marginTop: theme.spacing.xl,
-    },
-  },
-
   control: {
     height: 54,
     paddingLeft: 38,

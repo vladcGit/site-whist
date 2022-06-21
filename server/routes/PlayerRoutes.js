@@ -79,12 +79,6 @@ app.post('/play/:id', async (req, res) => {
     // if all cards have been played then go to next round
     //todo daca se ard toti sa se repete runda
 
-    // allPlayers = await room.getPlayers();
-    // const allCardsPlayed =
-    //   allPlayers
-    //     .map((p) => p.getDataValue('cards').length)
-    //     .filter((c) => c !== 0).length === 0;
-
     if (firstPlayerNumber === 0) {
       for (let p of allPlayers) {
         const bidded = p.getDataValue('initial_score');
