@@ -35,6 +35,11 @@ const useStyles = createStyles((theme) => ({
     maxWidth: '100%',
     maxHeight: '15vh',
     cursor: 'pointer',
+    margin: 10,
+  },
+
+  divider: {
+    width: '80%',
   },
 
   title: {
@@ -79,6 +84,7 @@ export default function Game() {
   const [socket, setsocket] = useState(null);
   const [room, setRoom] = useState(null);
   const [user, setUser] = useState(null);
+  const [playerToPlay, setPlayerToPlay] = useState(null);
 
   const { classes } = useStyles();
 
@@ -120,32 +126,48 @@ export default function Game() {
       const { name } = JSON.parse(localStorage.getItem('data'));
       const _user = room.Players.filter((player) => player.name === name)[0];
       setUser(_user);
+
+      // numar maxim carti player
+
+      const maxCards =
+        room.Players.map((a) => a.cards.length).reduce((a, b) => {
+          return Math.max(a, b);
+        }, -Infinity) / 2;
+
+      // salveaza primul jucator care are numarul maxim de carti
+      // e jucatorul al carui turn este
+
+      const copiePlayers = [...room.Players];
+      copiePlayers.sort((a, b) => a.index_order - b.index_order);
+      setPlayerToPlay(
+        copiePlayers.filter((p) => p.cards?.length / 2 === maxCards)[0]
+      );
     }
   }, [room, user]);
 
-  const prevPlayer = room?.Players?.filter(
-    (p) => p.index_order === user?.index_order - 1
-  )[0];
-
-  const canPlayCard =
-    room?.Players?.filter((p) => p.initial_score == null).length === 0 &&
-    (!prevPlayer || prevPlayer.cards.length > user?.cards.length);
-
   const playCard = async (card) => {
-    if (canPlayCard) console.log(card);
+    //todo daca nu au votat toti nu poti juca o carte
+    //todo sa poti juca cartea care trebuie (nu romb daca ai atu si atu e spade)
+    //todo sa inceapa jucatorul care a castigat tura trecuta
+    if (playerToPlay.id !== user.id) return;
+    await axios.post(
+      `/api/player/play/${user.id}`,
+      { card },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    sendUpdate();
   };
 
   return (
     <>
       {user && room && !room.is_finished && (
-        <div style={{ position: 'relative' }}>
+        <div style={{ minHeight: '100vh' }}>
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'start',
               alignItems: 'center',
-              minHeight: '100vh',
             }}
           >
             <Text className={classes.description}>Trump card:</Text>
@@ -154,44 +176,56 @@ export default function Game() {
               src={`/svg/${room.atu}.svg`}
               className={classes.image}
             />
-            <Divider my='xl' />
-            <Players room={room} user={user} callback={sendUpdate} />
+            <Divider my='xl' className={classes.divider} />
+            <Players
+              room={room}
+              user={user}
+              callback={sendUpdate}
+              userWithTurn={playerToPlay.id}
+            />
+            <Divider my='xl' className={classes.divider} />
+            <Text size='md'>Community cards</Text>
+            <div>
+              {room.cards?.split(',').map((card) => (
+                <img
+                  alt={card}
+                  key={card}
+                  src={`/svg/${card}.svg`}
+                  className={classes.image}
+                />
+              ))}
+            </div>
+            <Divider my='xl' className={classes.divider} />
           </div>
           <div
             style={{
-              position: 'absolute',
-              bottom: 0,
+              flexGrow: 1,
               width: '100vw',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
             }}
           >
-            {canPlayCard && (
-              <Text className={classes.subtitle}>It is your turn</Text>
-            )}
-            <Text className={classes.description}>
-              Your cards (click to play):
-            </Text>
-
-            {user.cards
-              .split(',')
-              .sort((a, b) => {
-                if (a[1] !== b[1]) return a.charCodeAt(1) - b.charCodeAt(1);
-                if (a[0] === 'A') return -1;
-                if (b[0] === 'A') return 1;
-                return a.charCodeAt(0) - b.charCodeAt(0);
-              })
-              .map((card) => (
-                <img
-                  key={card}
-                  alt={card}
-                  src={`/svg/${card}.svg`}
-                  className={classes.image}
-                  onClick={() => playCard(card)}
-                />
-              ))}
-            <Divider my='xl' />
+            <div>
+              {user.cards
+                .split(',')
+                .sort((a, b) => {
+                  if (a[1] !== b[1]) return a.charCodeAt(1) - b.charCodeAt(1);
+                  if (a[0] === 'A') return -1;
+                  if (b[0] === 'A') return 1;
+                  return a.charCodeAt(0) - b.charCodeAt(0);
+                })
+                .filter((c) => c.length > 0)
+                .map((card) => (
+                  <img
+                    key={card}
+                    alt={card}
+                    src={`/svg/${card}.svg`}
+                    className={classes.image}
+                    onClick={() => playCard(card)}
+                  />
+                ))}
+            </div>
           </div>
         </div>
       )}

@@ -10,7 +10,7 @@ import {
 import axios from 'axios';
 import React, { useState } from 'react';
 
-export default function Players({ room, user, callback }) {
+export default function Players({ room, user, callback, userWithTurn }) {
   const theme = useMantineTheme();
 
   const [vote, setVote] = useState(user.initial_score);
@@ -40,14 +40,24 @@ export default function Players({ room, user, callback }) {
   return (
     <Container style={{ width: '90vw' }}>
       <Grid size='xl'>
-        {room?.Players?.filter((p) => p.id !== user.id).map((player) => {
+        {room?.Players?.map((player) => {
           return (
             <Grid.Col xs={4} key={player.id}>
-              <Card shadow='sm' p='xl'>
+              <Card
+                shadow='sm'
+                p='xl'
+                sx={{
+                  backgroundColor:
+                    player.id === userWithTurn ? theme.colors.green[8] : '',
+                }}
+              >
                 <Group position='center' direction='column'>
                   <Text size='md'>{player.name}</Text>
                   {player.initial_score != null && (
                     <Text size='sm'>{`Bidded ${player.initial_score}`}</Text>
+                  )}
+                  {player.initial_score != null && (
+                    <Text size='sm'>{`Made ${player.final_score || 0}`}</Text>
                   )}
                 </Group>
               </Card>
@@ -55,6 +65,7 @@ export default function Players({ room, user, callback }) {
           );
         })}
         {/* Fiecare jucator voteaza cate maini face */}
+        {/* todo: sa nu fie primul jucator acelasi mereu */}
         {user.initial_score == null &&
           prevPlayerVoted &&
           room?.Players.length > 0 && (
