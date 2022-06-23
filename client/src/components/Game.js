@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import Players from './Players';
+import ModalClasament from './ModalClasament';
 
 const BREAKPOINT = '@media (max-width: 755px)';
 
@@ -173,6 +174,7 @@ export default function Game() {
 
   return (
     <>
+      {room && <ModalClasament players={room.Players} />}
       {user && room && !room.is_finished && (
         <div style={{ minHeight: '100vh' }}>
           <div
