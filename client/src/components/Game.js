@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createStyles, Divider, Text } from '@mantine/core';
-
+import { showNotification } from '@mantine/notifications';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
@@ -126,9 +126,40 @@ export default function Game() {
   };
 
   const playCard = async (card) => {
-    //todo daca nu au votat toti nu poti juca o carte
-    //todo sa poti juca cartea care trebuie (nu romb daca ai atu si atu e spade)
-    if (getCurrentPlayer().id !== user.id) return;
+    if (getCurrentPlayer().id !== user.id)
+      return showNotification({
+        message: 'It is not your turn',
+        color: 'red',
+      });
+    if (room?.Players.filter((p) => p.initial_score == null).length > 0)
+      return showNotification({
+        message: 'Wait for all the players to finish voting',
+        color: 'red',
+      });
+    // daca ai carte de acelasi suite
+    if (room.cards && card[1] !== room.cards[1]) {
+      const suiteCards = user.cards
+        .split(',')
+        .filter((c) => c[1] === room.cards[1]);
+      if (suiteCards.length > 0)
+        return showNotification({
+          message: 'You must play a card the same suit as the first card',
+          color: 'red',
+        });
+    }
+
+    // daca nu ai carte de acelasi suit dar ai atu
+
+    if (room.cards && card[1] !== room.cards[1]) {
+      const atuCards = user.cards
+        .split(',')
+        .filter((c) => c[1] === room.atu[1]);
+      if (atuCards.length > 0 && card[1] !== room.atu[1])
+        return showNotification({
+          message: 'You must play a card the same suit as the trump card',
+          color: 'red',
+        });
+    }
     await axios.post(
       `/api/player/play/${user.id}`,
       { card },
