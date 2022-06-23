@@ -43,6 +43,9 @@ const Room = sequelize.define('Room', {
   cards: {
     type: DataTypes.STRING,
   },
+  first_player_index: {
+    type: DataTypes.INTEGER,
+  },
 });
 
 Room.hasMany(Player, { onDelete: 'CASCADE' });

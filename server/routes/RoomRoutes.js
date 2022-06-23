@@ -4,7 +4,6 @@ const Room = require('../models/Room');
 const shuffleCards = require('./shuffleCards');
 const app = express();
 
-//todo sa nu mai poata nimeni sa intre in joc daca a inceput deja
 app.post('/new', async (req, res) => {
   try {
     const getRandomId = async () => {
@@ -53,6 +52,13 @@ app.get('/:id/start', async (req, res) => {
     const room = await Room.findByPk(req.params.id, { include: Player });
     if (!room)
       return res.status(400).json({ error: 'That room does not exist' });
+
+    const players = await room.getPlayers();
+
+    if (players.length < 3 && players.length > 6)
+      return res
+        .status(400)
+        .json({ error: 'The number of players must be between 3 and 6' });
 
     await shuffleCards(req.params.id);
     await room.update({ is_started: true });

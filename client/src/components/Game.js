@@ -37,7 +37,7 @@ export default function Game() {
   const [socket, setsocket] = useState(null);
   const [room, setRoom] = useState(null);
   const [user, setUser] = useState(null);
-  const [playerToPlay, setPlayerToPlay] = useState(null);
+  const [playerOrder, setPlayerOrder] = useState([]);
 
   const { classes } = useStyles();
 
@@ -75,34 +75,60 @@ export default function Game() {
 
   //get user
   useEffect(() => {
-    if (room) {
-      const { name } = JSON.parse(localStorage.getItem('data'));
-      const _user = room.Players.filter((player) => player.name === name)[0];
-      setUser(_user);
+    if (!room) return;
+    const { name } = JSON.parse(localStorage.getItem('data'));
+    const _user = room.Players.filter((player) => player.name === name)[0];
+    setUser(_user);
 
-      // numar maxim carti player
-
-      const maxCards =
-        room.Players.map((a) => a.cards.length).reduce((a, b) => {
-          return Math.max(a, b);
-        }, -Infinity) / 2;
-
-      // salveaza primul jucator care are numarul maxim de carti
-      // e jucatorul al carui turn este
-
-      const copiePlayers = [...room.Players];
-      copiePlayers.sort((a, b) => a.index_order - b.index_order);
-      setPlayerToPlay(
-        copiePlayers.filter((p) => p.cards?.length / 2 === maxCards)[0]
-      );
+    //calculeaza ordine jucatori
+    const turns = [];
+    let firstPlayerIndex;
+    if (room.first_player_index) {
+      const firstPlayer = room.Players.filter(
+        (p) => p.index_order === room.first_player_index
+      )[0];
+      firstPlayerIndex = room.Players.indexOf(firstPlayer);
+    } else {
+      firstPlayerIndex = (room.round - 1) % room.Players.length;
     }
+    for (let i = firstPlayerIndex; i < room.Players.length; i++) {
+      turns.push(room.Players[i]);
+    }
+
+    for (let i = 0; i < firstPlayerIndex; i++) {
+      turns.push(room.Players[i]);
+    }
+
+    setPlayerOrder(turns);
+    console.log(turns);
   }, [room, user]);
+
+  const getCurrentPlayer = () => {
+    // daca cineva nu a votat atunci e randul lui
+    const firstPlayerWithoutVote = playerOrder.filter(
+      (p) => p.initial_score == null
+    )[0];
+    if (firstPlayerWithoutVote) return firstPlayerWithoutVote;
+
+    // daca toti jucatorii au acelasi numar de carti, atunci se alege primul jucator
+    const firstPlayer = playerOrder[0];
+    const playerWithSameCards = room.Players.filter(
+      (p) => p.cards.length === firstPlayer.cards.length
+    ).length;
+    if (playerWithSameCards === room.Players.length) return firstPlayer;
+
+    // jucatorul cu cele mai putine carti
+    for (let i = 0; i < room.Players.length - 1; i++) {
+      if (playerOrder[i].cards.length < playerOrder[i + 1].cards.length)
+        return playerOrder[i + 1];
+    }
+    return firstPlayer;
+  };
 
   const playCard = async (card) => {
     //todo daca nu au votat toti nu poti juca o carte
     //todo sa poti juca cartea care trebuie (nu romb daca ai atu si atu e spade)
-    //todo sa inceapa jucatorul care a castigat tura trecuta
-    if (playerToPlay.id !== user.id) return;
+    if (getCurrentPlayer().id !== user.id) return;
     await axios.post(
       `/api/player/play/${user.id}`,
       { card },
@@ -134,7 +160,8 @@ export default function Game() {
               room={room}
               user={user}
               callback={sendUpdate}
-              userWithTurn={playerToPlay.id}
+              userWithTurn={getCurrentPlayer()}
+              voteOrder={playerOrder}
             />
             <Divider my='xl' className={classes.divider} />
             <Text size='md'>Community cards</Text>

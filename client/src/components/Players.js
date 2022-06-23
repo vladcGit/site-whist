@@ -10,19 +10,19 @@ import {
 import axios from 'axios';
 import React, { useState } from 'react';
 
-export default function Players({ room, user, callback, userWithTurn }) {
+export default function Players({
+  room,
+  user,
+  callback,
+  userWithTurn,
+  voteOrder,
+}) {
   const theme = useMantineTheme();
 
   const [vote, setVote] = useState(user.initial_score);
 
-  const prevPlayer = room?.Players?.filter(
-    (p) => p.index_order === user.index_order - 1
-  )[0];
-  const prevPlayerVoted = prevPlayer ? prevPlayer.initial_score != null : true;
-
-  const nextPlayer = room?.Players?.filter(
-    (p) => p.index_order === user.index_order + 1
-  )[0];
+  const indexOfPlayer = voteOrder.indexOf(user);
+  const nextPlayer = room?.Players[indexOfPlayer + 1];
 
   const submitNumberOfCards = async () => {
     await axios.post(
@@ -48,7 +48,7 @@ export default function Players({ room, user, callback, userWithTurn }) {
                 p='xl'
                 sx={{
                   backgroundColor:
-                    player.id === userWithTurn ? theme.colors.green[8] : '',
+                    player.id === userWithTurn.id ? theme.colors.green[8] : '',
                 }}
               >
                 <Group position='center' direction='column'>
@@ -65,9 +65,8 @@ export default function Players({ room, user, callback, userWithTurn }) {
           );
         })}
         {/* Fiecare jucator voteaza cate maini face */}
-        {/* todo: sa nu fie primul jucator acelasi mereu */}
         {user.initial_score == null &&
-          prevPlayerVoted &&
+          user.id === userWithTurn.id &&
           room?.Players.length > 0 && (
             <Grid.Col xs={12}>
               <Card shadow='sm' p='xl' mt='xl'>
