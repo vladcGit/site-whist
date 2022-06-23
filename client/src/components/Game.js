@@ -70,6 +70,9 @@ export default function Game() {
       setRoom(data);
       console.log(data);
     });
+    socket.on('notification', (message) => {
+      showNotification({ message, autoClose: false });
+    });
     return () => socket.disconnect();
   }, [socket, id]);
 

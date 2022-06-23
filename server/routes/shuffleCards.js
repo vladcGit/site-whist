@@ -1,6 +1,6 @@
 const Player = require('../models/Player');
 const Room = require('../models/Room');
-
+//todo shuffle mai random
 const shuffleCards = async (roomId) => {
   let deck = [
     '2H',

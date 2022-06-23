@@ -2,7 +2,26 @@ const express = require('express');
 const Player = require('../models/Player');
 const Room = require('../models/Room');
 const shuffleCards = require('./shuffleCards');
+const { sendNotification } = require('../socket');
+
 const app = express();
+
+const suites = {
+  H: 'Hearts',
+  D: 'Diamonds',
+  S: 'Spades',
+  C: 'Clubs',
+};
+
+const getCardValue = (card) => {
+  const value = card[0];
+  if (!isNaN(value)) return value;
+  else if (value === 'A') return 'Ace';
+  else if (value === 'K') return 'King';
+  else if (value === 'Q') return 'Queen';
+  else if (value === 'J') return 'Jack';
+  else if (value === 'T') return 'Ten';
+};
 
 app.post('/vote', async (req, res) => {
   try {
@@ -29,7 +48,17 @@ const compareCards = (a, b, firstSuite, atu = null) => {
 
   if (a[0] === 'K') return -1;
   if (b[0] === 'K') return 1;
-  else return a.charCodeAt(0) > b.charCodeAt(0) ? -1 : 1;
+
+  if (a[0] === 'Q') return -1;
+  if (b[0] === 'Q') return 1;
+
+  if (a[0] === 'J') return -1;
+  if (b[0] === 'J') return 1;
+
+  if (a[0] === 'T') return -1;
+  if (b[0] === 'T') return 1;
+
+  return a.charCodeAt(0) > b.charCodeAt(0) ? -1 : 1;
 };
 
 app.post('/play/:id', async (req, res) => {
@@ -100,7 +129,12 @@ app.post('/play/:id', async (req, res) => {
       cards: null,
       first_player_index: winningPlayer.index_order,
     });
-
+    sendNotification(
+      room.getDataValue('id'),
+      `${winningPlayer.getDataValue('name')} won with ${getCardValue(
+        winningCard
+      )} of ${suites[winningCard[1]]}`
+    );
     // if all cards have been played then go to next round
     //todo daca se ard toti sa se repete runda
 
