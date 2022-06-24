@@ -23,6 +23,19 @@ app.post('/new', async (req, res) => {
   }
 });
 
+app.put('/:id', async (req, res) => {
+  try {
+    const room = await Room.findByPk(req.params.id);
+    if (!room)
+      return res.status(400).json({ error: 'That room does not exist' });
+    await room.update(req.body);
+    res.status(201).json(room);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json(e);
+  }
+});
+
 app.post('/:id/player/new', async (req, res) => {
   try {
     const { id } = req.params;

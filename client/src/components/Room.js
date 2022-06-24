@@ -4,6 +4,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import {
   Button,
+  Checkbox,
   Grid,
   Container,
   Text,
@@ -11,6 +12,9 @@ import {
   Group,
   Card,
   useMantineTheme,
+  RadioGroup,
+  Radio,
+  Divider,
 } from '@mantine/core';
 const BREAKPOINT = '@media (max-width: 755px)';
 
@@ -67,6 +71,8 @@ export default function Room() {
 
   const { id } = useParams();
   const [room, setRoom] = useState(null);
+  const [checked, setChecked] = useState(true);
+  const [gameType, setGameType] = useState('1-8-1');
 
   const { classes } = useStyles();
   const theme = useMantineTheme();
@@ -75,6 +81,16 @@ export default function Room() {
     theme.colorScheme === 'dark' ? theme.colors.dark[1] : theme.colors.gray[7];
 
   const handleStartGame = async () => {
+    await axios.put(
+      `/api/room/${id}`,
+      { type: gameType },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
     await axios.get(`/api/room/${id}/start`);
     navigate(`/room/${id}/game`);
   };
@@ -102,9 +118,28 @@ export default function Room() {
         <h1 className={classes.description}>The code is: {id}</h1>
         {room?.Players[0]?.name ===
           JSON.parse(localStorage.getItem('data')).name && (
-          <Button variant='filled' size='lg' onClick={handleStartGame}>
-            Start
-          </Button>
+          <>
+            <Button variant='filled' size='lg' onClick={handleStartGame}>
+              Start
+            </Button>
+            <Divider my='xl' />
+            <Checkbox
+              checked={checked}
+              onChange={(event) => setChecked(event.currentTarget.checked)}
+              size='xl'
+              label='Play with your card unseen on games of one'
+            />
+            <Divider my='xl' />
+            <RadioGroup
+              value={gameType}
+              onChange={setGameType}
+              label='Select game type'
+              size='xl'
+            >
+              <Radio value='1-8-1' label='1-8-1' />
+              <Radio value='8-1-8' label='8-1-8' />
+            </RadioGroup>
+          </>
         )}
       </Container>
       <Container my='md'>
