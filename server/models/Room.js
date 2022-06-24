@@ -17,7 +17,6 @@ const Room = sequelize.define('Room', {
     allowNull: false,
     defaultValue: false,
   },
-  //todo
   type: {
     type: DataTypes.ENUM('1-8-1', '8-1-8'),
     defaultValue: '1-8-1',

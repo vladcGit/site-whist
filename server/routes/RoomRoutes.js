@@ -3,7 +3,7 @@ const Player = require('../models/Player');
 const Room = require('../models/Room');
 const shuffleCards = require('./shuffleCards');
 const app = express();
-
+//todo se poate incepe cu 2 jucatori pentru un motiv anume
 app.post('/new', async (req, res) => {
   try {
     const getRandomId = async () => {

@@ -47,7 +47,18 @@ const strategyEightOneEight = (round, numberOfPlayers) => {
   return numberOfCards;
 };
 
-//todo shuffle mai random
+const randomShuffle = (deck) => {
+  let i = deck.length,
+    k,
+    temp;
+  while (--i > 0) {
+    k = Math.floor(Math.random() * (i + 1));
+    temp = deck[k];
+    deck[k] = deck[i];
+    deck[i] = temp;
+  }
+};
+
 const shuffleCards = async (roomId) => {
   let deck = [
     '2H',
@@ -120,9 +131,7 @@ const shuffleCards = async (roomId) => {
   else numberOfCards = strategyEightOneEight(round, numberOfPlayers);
 
   // amesteca cartile si dupa le imparte
-  deck.sort(() => {
-    return 0.5 - Math.random();
-  });
+  randomShuffle(deck);
   for (player of jucatori) {
     const playerCards = [];
     for (let i = 0; i < numberOfCards; i++) {
