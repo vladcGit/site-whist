@@ -95,6 +95,7 @@ export default function Players({
                       display: 'flex',
                       justifyContent: 'space-evenly',
                       width: '100%',
+                      flexWrap: 'wrap',
                     }}
                   >
                     {[...user.cards.split(','), 'idk'].map((_, index) => {

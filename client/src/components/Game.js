@@ -186,13 +186,19 @@ export default function Game() {
               alignItems: 'center',
             }}
           >
-            <Text className={classes.description}>Trump card:</Text>
-            <img
-              alt={room.atu}
-              src={`/svg/${room.atu}.svg`}
-              className={classes.image}
-            />
-            <Divider my='xl' className={classes.divider} />
+            {getMaxNumberOfCards(room) !== 8 ? (
+              <>
+                <Text className={classes.description}>Trump card:</Text>
+                <img
+                  alt={room.atu}
+                  src={`/svg/${room.atu}.svg`}
+                  className={classes.image}
+                />
+                <Divider my='xl' className={classes.divider} />
+              </>
+            ) : (
+              <div style={{ height: '10vh' }} />
+            )}
             <Players
               room={room}
               user={user}
