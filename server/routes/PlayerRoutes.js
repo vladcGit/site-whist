@@ -42,8 +42,8 @@ const compareCards = (a, b, firstSuite, atu = null) => {
     else if (a[1] !== atu[1] && b[1] === atu[1]) return 1;
   }
 
-  if (a[1] === firstSuite[1] && b[1] !== firstSuite[1]) return -1;
-  else if (a[1] !== firstSuite[1] && b[1] === firstSuite[1]) return 1;
+  if (a[1] === firstSuite[0] && b[1] !== firstSuite[0]) return -1;
+  else if (a[1] !== firstSuite[0] && b[1] === firstSuite[0]) return 1;
 
   if (a[0] === 'A') return -1;
   if (b[0] === 'A') return 1;

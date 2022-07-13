@@ -153,6 +153,25 @@ describe('Jocuri de 1 pentru 3 jucatori', () => {
     expect(players[2].getDataValue('points')).to.be.equal(3);
   }).timeout(100000);
 
+  it('bug in testing', async () => {
+    const room = await Room.findByPk(id, { include: Player });
+    let players = await room.getPlayers();
+
+    await room.update({ atu: null });
+    await players[0].update({ cards: 'TC,AD' });
+    await players[1].update({ cards: 'JH,KS' });
+    await players[2].update({ cards: 'KD,JS' });
+
+    await playCard(players[0], 'TC');
+    await playCard(players[1], 'JH');
+    await playCard(players[2], 'KD');
+
+    players = await room.getPlayers();
+    expect(players[0].getDataValue('final_score')).to.be.equal(1);
+    expect(players[1].getDataValue('final_score')).to.be.equal(0);
+    expect(players[2].getDataValue('final_score')).to.be.equal(0);
+  }).timeout(100000);
+
   after(async () => {
     const room = await Room.findByPk(id);
     await room.destroy();

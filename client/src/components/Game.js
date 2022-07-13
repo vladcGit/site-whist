@@ -40,6 +40,7 @@ export default function Game() {
   const [room, setRoom] = useState(null);
   const [user, setUser] = useState(null);
   const [playerOrder, setPlayerOrder] = useState([]);
+  const [canPlayCard, setCanPlayCard] = useState(true);
 
   const { classes } = useStyles();
 
@@ -131,6 +132,8 @@ export default function Game() {
   };
 
   const playCard = async (card) => {
+    if (!canPlayCard) return;
+    setCanPlayCard(false);
     if (getCurrentPlayer().id !== user.id)
       return showNotification({
         message: 'It is not your turn',
@@ -155,7 +158,7 @@ export default function Game() {
 
     // daca nu ai carte de acelasi suit dar ai atu
 
-    if (room.cards && card[1] !== room.cards[1]) {
+    if (room.atu && room.cards && card[1] !== room.cards[1]) {
       const atuCards = user.cards
         .split(',')
         .filter((c) => c[1] === room.atu[1]);
@@ -171,6 +174,7 @@ export default function Game() {
       { headers: { 'Content-Type': 'application/json' } }
     );
     sendUpdate();
+    setCanPlayCard(true);
   };
 
   return (
