@@ -9,6 +9,7 @@ import {
 } from '@mantine/core';
 import axios from 'axios';
 import React, { useState } from 'react';
+import { getMaxNumberOfCards } from '../util';
 
 export default function Players({
   room,
@@ -59,6 +60,21 @@ export default function Players({
                   {player.initial_score != null && (
                     <Text size='sm'>{`Made ${player.final_score || 0}`}</Text>
                   )}
+                  {room.card_on_forehead === true &&
+                    getMaxNumberOfCards(room) === 1 &&
+                    player !== user &&
+                    room.Players.filter((p) => p.initial_score === null)
+                      .length !== 0 && (
+                      <img
+                        alt={player.cards}
+                        src={`/svg/${player.cards}.svg`}
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '15vh',
+                          margin: 10,
+                        }}
+                      />
+                    )}
                 </Group>
               </Card>
             </Grid.Col>

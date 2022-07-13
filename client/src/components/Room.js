@@ -83,7 +83,7 @@ export default function Room() {
   const handleStartGame = async () => {
     await axios.put(
       `/api/room/${id}`,
-      { type: gameType },
+      { type: gameType, card_on_forehead: checked },
       {
         headers: {
           'Content-Type': 'application/json',

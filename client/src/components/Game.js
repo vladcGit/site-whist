@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import Players from './Players';
 import ModalClasament from './ModalClasament';
+import { getMaxNumberOfCards } from '../util';
 
 const BREAKPOINT = '@media (max-width: 755px)';
 
@@ -223,24 +224,28 @@ export default function Game() {
             }}
           >
             <div>
-              {user.cards
-                .split(',')
-                .sort((a, b) => {
-                  if (a[1] !== b[1]) return a.charCodeAt(1) - b.charCodeAt(1);
-                  if (a[0] === 'A') return -1;
-                  if (b[0] === 'A') return 1;
-                  return a.charCodeAt(0) - b.charCodeAt(0);
-                })
-                .filter((c) => c.length > 0)
-                .map((card) => (
-                  <img
-                    key={card}
-                    alt={card}
-                    src={`/svg/${card}.svg`}
-                    className={classes.image}
-                    onClick={() => playCard(card)}
-                  />
-                ))}
+              {(room.card_on_forehead === false ||
+                getMaxNumberOfCards(room) !== 1 ||
+                room.Players.filter((p) => p.initial_score === null).length ===
+                  0) &&
+                user.cards
+                  .split(',')
+                  .sort((a, b) => {
+                    if (a[1] !== b[1]) return a.charCodeAt(1) - b.charCodeAt(1);
+                    if (a[0] === 'A') return -1;
+                    if (b[0] === 'A') return 1;
+                    return a.charCodeAt(0) - b.charCodeAt(0);
+                  })
+                  .filter((c) => c.length > 0)
+                  .map((card) => (
+                    <img
+                      key={card}
+                      alt={card}
+                      src={`/svg/${card}.svg`}
+                      className={classes.image}
+                      onClick={() => playCard(card)}
+                    />
+                  ))}
             </div>
           </div>
         </div>

@@ -21,6 +21,10 @@ const Room = sequelize.define('Room', {
     type: DataTypes.ENUM('1-8-1', '8-1-8'),
     defaultValue: '1-8-1',
   },
+  card_on_forehead: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
   //todo
   has_prizes: {
     type: DataTypes.BOOLEAN,

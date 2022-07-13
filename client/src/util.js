@@ -27,4 +27,58 @@ function hexToRgb(hex) {
     : null;
 }
 
-export { formatDate, hexToRgb };
+// cate carti a primit fiecare jucator la inceputul rundei
+const getMaxNumberOfCards = (room) => {
+  const strategyOneEightOne = (round, numberOfPlayers) => {
+    let numberOfCards;
+
+    // primele jocuri de 1
+    if (round / numberOfPlayers <= 1) numberOfCards = 1;
+    // primele jocuri intre 2 si 7
+    else if (round >= numberOfPlayers + 1 && round <= numberOfPlayers + 6)
+      numberOfCards = round - numberOfPlayers + 1;
+    // jocurile de 8
+    else if (round >= numberOfPlayers + 7 && round <= 2 * numberOfPlayers + 6)
+      numberOfCards = 8;
+    // a doua tura de jocuri intre 2 si 7
+    else if (
+      round >= 2 * numberOfPlayers + 7 &&
+      round <= 2 * numberOfPlayers + 12
+    )
+      numberOfCards = 2 * numberOfPlayers + 14 - round;
+    // ultimul joc de 1
+    else numberOfCards = 1;
+
+    return numberOfCards;
+  };
+
+  const strategyEightOneEight = (round, numberOfPlayers) => {
+    let numberOfCards;
+
+    // primele jocuri de 8
+    if (round / numberOfPlayers <= 1) numberOfCards = 8;
+    // primele jocuri intre 2 si 7
+    else if (round >= numberOfPlayers + 1 && round <= numberOfPlayers + 6)
+      numberOfCards = 8 - (round - numberOfPlayers);
+    // jocurile de 1
+    else if (round >= numberOfPlayers + 7 && round <= 2 * numberOfPlayers + 6)
+      numberOfCards = 1;
+    // a doua tura de jocuri intre 2 si 7
+    else if (
+      round >= 2 * numberOfPlayers + 7 &&
+      round <= 2 * numberOfPlayers + 12
+    )
+      numberOfCards = round - 2 * numberOfPlayers - 5;
+    // ultimul joc de 8
+    else numberOfCards = 8;
+
+    return numberOfCards;
+  };
+
+  if (room.type === '1-8-1')
+    return strategyOneEightOne(room.round, room.Players.length);
+  else if (room.type === '8-1-8')
+    return strategyEightOneEight(room.round, room.Players.length);
+};
+
+export { formatDate, hexToRgb, getMaxNumberOfCards };
