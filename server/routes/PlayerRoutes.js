@@ -27,6 +27,8 @@ app.post('/vote', async (req, res) => {
   try {
     const { vote, playerId } = req.body;
     const player = await Player.findByPk(playerId);
+
+    // todo: check if the player can vote that amount
     await player.update({ initial_score: vote });
     res.status(200).json({ message: 'update complete' });
   } catch (e) {
