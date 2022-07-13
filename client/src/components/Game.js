@@ -40,7 +40,7 @@ export default function Game() {
   const [room, setRoom] = useState(null);
   const [user, setUser] = useState(null);
   const [playerOrder, setPlayerOrder] = useState([]);
-  const [canPlayCard, setCanPlayCard] = useState(true);
+  const [lastCard, setLastCard] = useState(null);
 
   const { classes } = useStyles();
 
@@ -132,8 +132,9 @@ export default function Game() {
   };
 
   const playCard = async (card) => {
-    if (!canPlayCard) return;
-    setCanPlayCard(false);
+    //todo inca se poate da mai mult de o carte (am vazut doar la primul ca merge)
+    console.log(lastCard);
+    if (lastCard) return;
     if (getCurrentPlayer().id !== user.id)
       return showNotification({
         message: 'It is not your turn',
@@ -144,6 +145,7 @@ export default function Game() {
         message: 'Wait for all the players to finish voting',
         color: 'red',
       });
+
     // daca ai carte de acelasi suite
     if (room.cards && card[1] !== room.cards[1]) {
       const suiteCards = user.cards
@@ -168,13 +170,59 @@ export default function Game() {
           color: 'red',
         });
     }
+
+    setLastCard(card);
+
+    // se mai asteapta putin dupa ultima carte
+    const isLastPlayer =
+      room.Players.filter((p) => p.cards.length === user.cards.length)
+        .length === 1;
+    if (isLastPlayer) {
+      // pune cartea pe masa
+      await axios.put(
+        `/api/room/${id}`,
+        {
+          cards: room.cards + `,${card}`,
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      sendUpdate();
+
+      // todo nu se updateaza pana se termina timpul pentru player ul care da cartea
+      const roomCopy = JSON.parse(JSON.stringify(room));
+      roomCopy.cards += `,${card}`;
+      const actualUser = roomCopy.Players.filter((p) => p.id === user.id)[0];
+      actualUser.cards = actualUser.cards
+        .split(',')
+        .filter((c) => c !== card)
+        .join(',');
+
+      setRoom(roomCopy);
+      await new Promise((r) => setTimeout(r, 1));
+
+      // asteapta sa fie vazuta de ceilalti
+      await new Promise((r) => setTimeout(r, 3000));
+
+      // reactualizeaza in bd fara ultima carte
+      room.cards = room.cards
+        .split(',')
+        .filter((c) => c !== card)
+        .join(',');
+      await axios.put(
+        `/api/room/${id}`,
+        {
+          cards: room.cards,
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+    }
     await axios.post(
       `/api/player/play/${user.id}`,
       { card },
       { headers: { 'Content-Type': 'application/json' } }
     );
     sendUpdate();
-    setCanPlayCard(true);
+    setLastCard(null);
   };
 
   return (
@@ -213,14 +261,16 @@ export default function Game() {
             <Divider my='xl' className={classes.divider} />
             <Text size='md'>Community cards</Text>
             <div>
-              {room.cards?.split(',').map((card) => (
-                <img
-                  alt={card}
-                  key={card}
-                  src={`/svg/${card}.svg`}
-                  className={classes.image}
-                />
-              ))}
+              {room.cards?.split(',').map((card) => {
+                return card !== lastCard ? (
+                  <img
+                    alt={card}
+                    key={card}
+                    src={`/svg/${card}.svg`}
+                    className={classes.image}
+                  />
+                ) : null;
+              })}
             </div>
             <Divider my='xl' className={classes.divider} />
           </div>
