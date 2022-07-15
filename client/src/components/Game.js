@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createStyles, Divider, Text } from '@mantine/core';
+import { createStyles, Divider, Skeleton, Text } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -20,6 +20,10 @@ const useStyles = createStyles((theme) => ({
 
   divider: {
     width: '80%',
+  },
+
+  skeleton: {
+    margin: 10,
   },
 
   description: {
@@ -260,7 +264,7 @@ export default function Game() {
             />
             <Divider my='xl' className={classes.divider} />
             <Text size='md'>Community cards</Text>
-            <div>
+            <div style={{ display: 'flex' }}>
               {room.cards?.split(',').map((card) => (
                 <img
                   alt={card}
@@ -268,6 +272,25 @@ export default function Game() {
                   src={`/svg/${card}.svg`}
                   className={classes.image}
                 />
+              ))}
+              {Array.apply(
+                null,
+                Array(
+                  room.Players.length - (room.cards?.split(',').length || 0)
+                )
+              ).map((_, index) => (
+                <Skeleton
+                  key={`skeleton ${index}`}
+                  radius='md'
+                  className={classes.skeleton}
+                >
+                  <img
+                    alt=''
+                    className={classes.image}
+                    src={`/svg/AH.svg`}
+                    style={{ margin: 0 }}
+                  />
+                </Skeleton>
               ))}
             </div>
             <Divider my='xl' className={classes.divider} />
