@@ -315,6 +315,14 @@ export default function Game() {
                     if (a[1] !== b[1]) return a.charCodeAt(1) - b.charCodeAt(1);
                     if (a[0] === 'A') return -1;
                     if (b[0] === 'A') return 1;
+                    if (a[0] === 'K') return -1;
+                    if (b[0] === 'K') return 1;
+                    if (a[0] === 'Q') return -1;
+                    if (b[0] === 'Q') return 1;
+                    if (a[0] === 'J') return -1;
+                    if (b[0] === 'J') return 1;
+                    if (a[0] === 'T') return -1;
+                    if (b[0] === 'T') return 1;
                     return a.charCodeAt(0) - b.charCodeAt(0);
                   })
                   .filter((c) => c.length > 0)
