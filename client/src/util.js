@@ -81,4 +81,6 @@ const getMaxNumberOfCards = (room) => {
     return strategyEightOneEight(room.round, room.Players.length);
 };
 
-export { formatDate, hexToRgb, getMaxNumberOfCards };
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+export { formatDate, hexToRgb, getMaxNumberOfCards, sleep };

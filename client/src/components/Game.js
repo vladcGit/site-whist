@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import Players from './Players';
 import ModalClasament from './ModalClasament';
-import { getMaxNumberOfCards } from '../util';
+import { getMaxNumberOfCards, sleep } from '../util';
 
 const BREAKPOINT = '@media (max-width: 755px)';
 
@@ -137,7 +137,6 @@ export default function Game() {
 
   const playCard = async (card) => {
     //todo inca se poate da mai mult de o carte (am vazut doar la primul ca merge)
-    console.log(lastCard);
     if (lastCard) return;
     if (getCurrentPlayer().id !== user.id)
       return showNotification({
@@ -188,7 +187,6 @@ export default function Game() {
       });
       sendUpdate();
 
-      // todo nu se updateaza pana se termina timpul pentru player ul care da cartea
       const roomCopy = JSON.parse(JSON.stringify(room));
       roomCopy.cards += `,${card}`;
       const actualUser = roomCopy.Players.filter((p) => p.id === user.id)[0];
@@ -198,10 +196,9 @@ export default function Game() {
         .join(',');
 
       setRoom(roomCopy);
-      await new Promise((r) => setTimeout(r, 1));
 
       // asteapta sa fie vazuta de ceilalti
-      await new Promise((r) => setTimeout(r, 3000));
+      await sleep(3000);
 
       // reactualizeaza in bd fara ultima carte
       room.cards = room.cards
