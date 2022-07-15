@@ -261,16 +261,14 @@ export default function Game() {
             <Divider my='xl' className={classes.divider} />
             <Text size='md'>Community cards</Text>
             <div>
-              {room.cards?.split(',').map((card) => {
-                return card !== lastCard ? (
-                  <img
-                    alt={card}
-                    key={card}
-                    src={`/svg/${card}.svg`}
-                    className={classes.image}
-                  />
-                ) : null;
-              })}
+              {room.cards?.split(',').map((card) => (
+                <img
+                  alt={card}
+                  key={card}
+                  src={`/svg/${card}.svg`}
+                  className={classes.image}
+                />
+              ))}
             </div>
             <Divider my='xl' className={classes.divider} />
           </div>
@@ -297,15 +295,17 @@ export default function Game() {
                     return a.charCodeAt(0) - b.charCodeAt(0);
                   })
                   .filter((c) => c.length > 0)
-                  .map((card) => (
-                    <img
-                      key={card}
-                      alt={card}
-                      src={`/svg/${card}.svg`}
-                      className={classes.image}
-                      onClick={() => playCard(card)}
-                    />
-                  ))}
+                  .map((card) =>
+                    card !== lastCard ? (
+                      <img
+                        key={card}
+                        alt={card}
+                        src={`/svg/${card}.svg`}
+                        className={classes.image}
+                        onClick={() => playCard(card)}
+                      />
+                    ) : null
+                  )}
             </div>
           </div>
         </div>
