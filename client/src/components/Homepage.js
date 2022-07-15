@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../axios';
 import { useNavigate } from 'react-router-dom';
 
 import { createStyles, Container, Text, Button, Input } from '@mantine/core';
@@ -90,21 +90,13 @@ export default function Homepage() {
       });
     const resRoom = await axios.post(`/api/room/new`);
     const { id } = resRoom.data;
-    await axios.post(
-      `/api/room/${id}/player/new`,
-      { name },
-      { headers: { 'Content-Type': 'application/json' } }
-    );
+    await axios.post(`/api/room/${id}/player/new`, { name });
     localStorage.setItem('data', JSON.stringify({ id, name }));
     navigate(`/room/${id}`);
   };
 
   const handleJoinRoom = async () => {
-    await axios.post(
-      `/api/room/${code}/player/new`,
-      { name },
-      { headers: { 'Content-Type': 'application/json' } }
-    );
+    await axios.post(`/api/room/${code}/player/new`, { name });
     localStorage.setItem('data', JSON.stringify({ code, name }));
     navigate(`/room/${code}`);
   };

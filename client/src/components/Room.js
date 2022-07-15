@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../axios';
 import { io } from 'socket.io-client';
 import {
   Button,
@@ -81,15 +81,10 @@ export default function Room() {
     theme.colorScheme === 'dark' ? theme.colors.dark[1] : theme.colors.gray[7];
 
   const handleStartGame = async () => {
-    await axios.put(
-      `/api/room/${id}`,
-      { type: gameType, card_on_forehead: checked },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    await axios.put(`/api/room/${id}`, {
+      type: gameType,
+      card_on_forehead: checked,
+    });
 
     await axios.get(`/api/room/${id}/start`);
     navigate(`/room/${id}/game`);

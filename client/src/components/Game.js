@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createStyles, Divider, Skeleton, Text } from '@mantine/core';
 import { showNotification } from '@mantine/notifications';
-import axios from 'axios';
+import axios from '../axios';
 import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import Players from './Players';
@@ -183,13 +183,9 @@ export default function Game() {
         .length === 1;
     if (isLastPlayer) {
       // pune cartea pe masa
-      await axios.put(
-        `/api/room/${id}`,
-        {
-          cards: room.cards + `,${card}`,
-        },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
+      await axios.put(`/api/room/${id}`, {
+        cards: room.cards + `,${card}`,
+      });
       sendUpdate();
 
       // todo nu se updateaza pana se termina timpul pentru player ul care da cartea
@@ -212,19 +208,11 @@ export default function Game() {
         .split(',')
         .filter((c) => c !== card)
         .join(',');
-      await axios.put(
-        `/api/room/${id}`,
-        {
-          cards: room.cards,
-        },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
+      await axios.put(`/api/room/${id}`, {
+        cards: room.cards,
+      });
     }
-    await axios.post(
-      `/api/player/play/${user.id}`,
-      { card },
-      { headers: { 'Content-Type': 'application/json' } }
-    );
+    await axios.post(`/api/player/play/${user.id}`, { card });
     sendUpdate();
     setLastCard(null);
   };

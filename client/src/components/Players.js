@@ -7,7 +7,7 @@ import {
   useMantineTheme,
   Button,
 } from '@mantine/core';
-import axios from 'axios';
+import axios from '../axios';
 import React, { useState } from 'react';
 import { getMaxNumberOfCards } from '../util';
 
@@ -26,15 +26,7 @@ export default function Players({
   const nextPlayer = room?.Players[indexOfPlayer + 1];
 
   const submitNumberOfCards = async () => {
-    await axios.post(
-      '/api/player/vote',
-      { vote, playerId: user.id },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    await axios.post('/api/player/vote', { vote, playerId: user.id });
     callback();
   };
 
