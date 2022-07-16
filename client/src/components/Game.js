@@ -51,7 +51,11 @@ export default function Game() {
   useEffect(() => {
     const fetchRoom = async () => {
       const res = await axios.get(`/api/room/${id}`);
-      setRoom(res.data);
+      const _room = res.data;
+      _room.Players = _room.Players.sort(
+        (a, b) => a.index_order - b.index_order
+      );
+      setRoom(_room);
     };
     fetchRoom();
 
@@ -94,18 +98,17 @@ export default function Game() {
     const turns = [];
     let firstPlayerIndex;
     if (room.first_player_index) {
-      const firstPlayer = room.Players.filter(
-        (p) => p.index_order === room.first_player_index
-      )[0];
-      firstPlayerIndex = room.Players.indexOf(firstPlayer);
+      firstPlayerIndex = room.first_player_index;
     } else {
-      firstPlayerIndex = (room.round - 1) % room.Players.length;
+      firstPlayerIndex = room.round % room.Players.length;
+      if (firstPlayerIndex === 0) firstPlayerIndex = room.Players.length;
     }
-    for (let i = firstPlayerIndex; i < room.Players.length; i++) {
+    console.log(firstPlayerIndex);
+    for (let i = firstPlayerIndex - 1; i < room.Players.length; i++) {
       turns.push(room.Players[i]);
     }
 
-    for (let i = 0; i < firstPlayerIndex; i++) {
+    for (let i = 0; i < firstPlayerIndex - 1; i++) {
       turns.push(room.Players[i]);
     }
 

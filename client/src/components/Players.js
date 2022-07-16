@@ -22,56 +22,61 @@ export default function Players({
 
   const [vote, setVote] = useState(user.initial_score);
 
-  const indexOfPlayer = voteOrder.indexOf(user);
-  const nextPlayer = room?.Players[indexOfPlayer + 1];
+  const nextPlayer = room?.Players[voteOrder.indexOf(user) + 1];
 
   const submitNumberOfCards = async () => {
     await axios.post('/api/player/vote', { vote, playerId: user.id });
     callback();
   };
 
+  console.log(userWithTurn);
+
   return (
     <Container style={{ width: '90vw' }}>
       <Grid size='xl'>
-        {room?.Players?.map((player) => {
-          return (
-            <Grid.Col xs={4} key={player.id}>
-              <Card
-                shadow='sm'
-                p='xl'
-                sx={{
-                  backgroundColor:
-                    player.id === userWithTurn.id ? theme.colors.green[8] : '',
-                }}
-              >
-                <Group position='center' direction='column'>
-                  <Text size='md'>{player.name}</Text>
-                  {player.initial_score != null && (
-                    <Text size='sm'>{`Bidded ${player.initial_score}`}</Text>
-                  )}
-                  {player.initial_score != null && (
-                    <Text size='sm'>{`Made ${player.final_score || 0}`}</Text>
-                  )}
-                  {room.card_on_forehead === true &&
-                    getMaxNumberOfCards(room) === 1 &&
-                    player !== user &&
-                    room.Players.filter((p) => p.initial_score === null)
-                      .length !== 0 && (
-                      <img
-                        alt={player.cards}
-                        src={`/svg/${player.cards}.svg`}
-                        style={{
-                          maxWidth: '100%',
-                          maxHeight: '15vh',
-                          margin: 10,
-                        }}
-                      />
+        {room?.Players?.sort((a, b) => a.index_order - b.index_order)?.map(
+          (player) => {
+            return (
+              <Grid.Col xs={4} key={player.id}>
+                <Card
+                  shadow='sm'
+                  p='xl'
+                  sx={{
+                    backgroundColor:
+                      player.id === userWithTurn.id
+                        ? theme.colors.green[8]
+                        : '',
+                  }}
+                >
+                  <Group position='center' direction='column'>
+                    <Text size='md'>{player.name}</Text>
+                    {player.initial_score != null && (
+                      <Text size='sm'>{`Bidded ${player.initial_score}`}</Text>
                     )}
-                </Group>
-              </Card>
-            </Grid.Col>
-          );
-        })}
+                    {player.initial_score != null && (
+                      <Text size='sm'>{`Made ${player.final_score || 0}`}</Text>
+                    )}
+                    {room.card_on_forehead === true &&
+                      getMaxNumberOfCards(room) === 1 &&
+                      player !== user &&
+                      room.Players.filter((p) => p.initial_score === null)
+                        .length !== 0 && (
+                        <img
+                          alt={player.cards}
+                          src={`/svg/${player.cards}.svg`}
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: '15vh',
+                            margin: 10,
+                          }}
+                        />
+                      )}
+                  </Group>
+                </Card>
+              </Grid.Col>
+            );
+          }
+        )}
         {/* Fiecare jucator voteaza cate maini face */}
         {user.initial_score == null &&
           user.id === userWithTurn.id &&

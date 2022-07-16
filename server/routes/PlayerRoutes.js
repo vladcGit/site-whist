@@ -87,6 +87,9 @@ app.post('/play/:id', async (req, res) => {
 
     // daca e ultima carte din tura aia
     let allPlayers = await room.getPlayers();
+    allPlayers = allPlayers.sort(
+      (a, b) => a.getDataValue('index_order') - b.getDataValue('index_order')
+    );
     const firstPlayerNumber = allPlayers[0].getDataValue('cards').length;
     const playerWithSameNumber = allPlayers.filter(
       (p) => p.getDataValue('cards').length === firstPlayerNumber

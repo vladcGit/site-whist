@@ -20,7 +20,7 @@ exports.socketConnection = (server) => {
       try {
         const { id } = JSON.parse(message);
         const room = await Room.findByPk(parseInt(id), {
-          include: [{ model: Player }],
+          include: [{ model: Player, order: [['index_order', 'ASC']] }],
         });
 
         response = JSON.stringify(room);
