@@ -140,7 +140,9 @@ const shuffleCards = async (roomId) => {
     await player.update({ cards: playerCards.join(',') });
   }
 
-  await room.update({ atu: deck.pop() });
+  if (numberOfCards !== 8) await room.update({ atu: deck.pop() });
+  else await room.update({ atu: null });
+  console.log(numberOfCards);
 };
 
 module.exports = shuffleCards;

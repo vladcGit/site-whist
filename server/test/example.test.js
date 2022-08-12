@@ -240,3 +240,83 @@ describe('Alte jocuri de 1 pentru 3 jucatori', () => {
     await room.destroy();
   });
 });
+
+describe('Joc de 7 si dupa de 8 pentru 3 jucatori', () => {
+  const addPlayer = async (id, name) => {
+    const res = await axios.post(`/api/room/${id}/player/new`, { name });
+    return res;
+  };
+
+  const playerVote = async (player, vote) => {
+    const res = await axios.post(`/api/player/vote`, {
+      vote,
+      playerId: player.getDataValue('id'),
+    });
+    return res;
+  };
+
+  const playCard = async (player, card) => {
+    await axios.post(`/api/player/play/${player.getDataValue('id')}`, { card });
+  };
+  let id;
+  before(async () => {
+    const resRoom = await axios.post(`/api/room/new`);
+    id = resRoom.data.id;
+
+    await addPlayer(id, 'Vlad');
+    await addPlayer(id, 'Chris');
+    await addPlayer(id, 'Adriana');
+
+    await axios.put(`/api/room/${id}`, {
+      type: '1-8-1',
+      card_on_forehead: true,
+      round: 10,
+    });
+    await axios.get(`/api/room/${id}/start`);
+  });
+
+  it('game', async () => {
+    let room = await Room.findByPk(id, { include: Player });
+    let players = await room.getPlayers();
+
+    await room.update({ atu: '9H' });
+    await players[0].update({ cards: 'TD' });
+    await players[1].update({ cards: '9D' });
+    await players[2].update({ cards: 'KH' });
+
+    await playerVote(players[0], 0);
+    await playerVote(players[1], 0);
+    await playerVote(players[2], 0);
+
+    await playCard(players[0], players[0].getDataValue('cards').split(',')[0]);
+    await playCard(players[1], players[1].getDataValue('cards').split(',')[0]);
+    await playCard(players[2], players[2].getDataValue('cards').split(',')[0]);
+
+    room = await Room.findByPk(id, { include: Player });
+    expect(room.round).to.be.equal(11);
+    expect(room.atu).to.be.null;
+
+    // await players[0].update({ cards: 'TS' });
+    // await players[1].update({ cards: '9D' });
+    // await players[2].update({ cards: 'KH' });
+
+    // await playerVote(players[1], 0);
+    // await playerVote(players[2], 0);
+    // await playerVote(players[0], 0);
+
+    // await playCard(players[1], players[1].getDataValue('cards').split(',')[0]);
+    // await playCard(players[2], players[2].getDataValue('cards').split(',')[0]);
+    // await playCard(players[0], players[0].getDataValue('cards').split(',')[0]);
+
+    // players = await room.getPlayers();
+
+    // expect(players[0].getDataValue('points')).to.be.equal(10);
+    // expect(players[1].getDataValue('points')).to.be.equal(4);
+    // expect(players[2].getDataValue('points')).to.be.equal(4);
+  }).timeout(100000);
+
+  after(async () => {
+    const room = await Room.findByPk(id);
+    await room.destroy();
+  });
+});
